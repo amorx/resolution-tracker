@@ -13,7 +13,8 @@ FROM nginxinc/nginx-unprivileged:1.27-alpine AS runtime
 LABEL org.opencontainers.image.source="resolution-tracker-web"
 
 USER root
-RUN rm -rf /usr/share/nginx/html/* && \
+RUN apk upgrade --no-cache && \
+    rm -rf /usr/share/nginx/html/* && \
     mkdir -p /var/cache/nginx /var/run /var/log/nginx && \
     chown -R nginx:nginx /var/cache/nginx /var/run /var/log/nginx
 USER nginx
