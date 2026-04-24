@@ -1,0 +1,7 @@
+[allowlist]
+  description = "Allowlist for known historical false positives"
+  # Old SecurePipeline commit that carried an ENCRYPTION_KEY placeholder value
+  # into the git history before this repo was repurposed for Resolution Tracker.
+  commits = [
+    "5fd6cdcb56d77915fba1ff8aa1942705cba2ebe4",
+  ]
