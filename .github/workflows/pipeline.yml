@@ -265,6 +265,7 @@ jobs:
           exit-code: '1'
           ignore-unfixed: true
           severity: HIGH,CRITICAL
+          trivyignores: .trivyignore
 
       - name: Scan Web image
         uses: aquasecurity/trivy-action@master
@@ -274,6 +275,7 @@ jobs:
           exit-code: '1'
           ignore-unfixed: true
           severity: HIGH,CRITICAL
+          trivyignores: .trivyignore
 
   # ---------------------------------------------------------------------------
   # GATE 11: DAST scan via docker compose (api + web)

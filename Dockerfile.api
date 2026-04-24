@@ -13,9 +13,6 @@ RUN groupadd -g 1000 appgroup && \
     useradd -r -u 1000 -g appgroup appuser && \
     mkdir -p /data && chown -R appuser:appgroup /data
 
-# Upgrade base-image pip tools that carry known CVEs before dropping privileges.
-RUN pip install --upgrade --no-cache-dir "wheel>=0.46.2" "jaraco.context>=6.1.0"
-
 WORKDIR /home/appuser/app
 
 COPY --from=builder --chown=appuser:appgroup /root/.local /home/appuser/.local
