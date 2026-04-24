@@ -242,12 +242,46 @@ jobs:
           path: web/sbom.json
 
   # ---------------------------------------------------------------------------
-  # GATE 10: DAST scan via docker compose (api + web)
+  # GATE 10: Container image CVE scan (Trivy)
+  # ---------------------------------------------------------------------------
+  image-scan:
+    name: "Container Image Scan (Trivy)"
+    runs-on: ubuntu-latest
+    needs: docker-lint
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Build API image
+        run: docker build -t resolution-api -f Dockerfile.api .
+
+      - name: Build Web image
+        run: docker build -t resolution-web -f web/Dockerfile ./web
+
+      - name: Scan API image
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: resolution-api
+          format: table
+          exit-code: '1'
+          ignore-unfixed: true
+          severity: HIGH,CRITICAL
+
+      - name: Scan Web image
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: resolution-web
+          format: table
+          exit-code: '1'
+          ignore-unfixed: true
+          severity: HIGH,CRITICAL
+
+  # ---------------------------------------------------------------------------
+  # GATE 11: DAST scan via docker compose (api + web)
   # ---------------------------------------------------------------------------
   dast-scan:
     name: "Dynamic Security Scan (ZAP)"
     runs-on: ubuntu-latest
-    needs: [docker-lint, logic-and-coverage, web-lint-and-test]
+    needs: [image-scan, logic-and-coverage, web-lint-and-test]
     steps:
       - uses: actions/checkout@v6
 
@@ -259,11 +293,10 @@ jobs:
           echo "OLLAMA_URL=http://localhost:11434" >> .env
         shell: bash
 
-      - name: Build API image
-        run: docker build -t resolution-api -f Dockerfile.api .
-
-      - name: Build Web image
-        run: docker build -t resolution-web -f web/Dockerfile ./web
+      - name: Build images
+        run: |
+          docker build -t resolution-api -f Dockerfile.api .
+          docker build -t resolution-web -f web/Dockerfile ./web
 
       - name: Start services
         run: |
