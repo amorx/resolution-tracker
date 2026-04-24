@@ -18,9 +18,9 @@ jobs:
   lint-and-shield:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.11'
 
@@ -47,9 +47,9 @@ jobs:
     needs: lint-and-shield
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.11'
           cache: 'pip'
@@ -81,9 +81,9 @@ jobs:
     needs: legal-licenses-checks
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.11'
           cache: 'pip'
@@ -113,7 +113,7 @@ jobs:
   secrets-scan:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Gitleaks Scan
@@ -128,7 +128,7 @@ jobs:
     name: Docker Security Audit
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Lint API Dockerfile (Hadolint)
         uses: hadolint/hadolint-action@v3.1.0
         with:
@@ -147,7 +147,7 @@ jobs:
   infra-scan:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Checkov GitHub Action
         uses: bridgecrewio/checkov-action@master
         with:
@@ -163,7 +163,7 @@ jobs:
     name: "Infrastructure Security Audit"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Run Checkov
         uses: bridgecrewio/checkov-action@master
         with:
@@ -182,9 +182,9 @@ jobs:
       run:
         working-directory: web
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Set up Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '20'
           cache: 'npm'
@@ -215,9 +215,9 @@ jobs:
       run:
         working-directory: web
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Set up Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '20'
           cache: 'npm'
@@ -249,7 +249,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [docker-lint, logic-and-coverage, web-lint-and-test]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Generate ephemeral secrets
         run: |
@@ -281,7 +281,7 @@ jobs:
           chmod -R 777 .
 
       - name: OWASP ZAP Baseline Scan (API)
-        uses: zaproxy/action-baseline@v0.12.0
+        uses: zaproxy/action-baseline@v0.15.0
         with:
           target: 'http://localhost:8080'
           rules_file_name: '.zap/rules.tsv'
@@ -289,7 +289,7 @@ jobs:
           fail_action: true
 
       - name: OWASP ZAP Baseline Scan (Web)
-        uses: zaproxy/action-baseline@v0.12.0
+        uses: zaproxy/action-baseline@v0.15.0
         with:
           target: 'http://localhost:5173'
           rules_file_name: '.zap/rules.tsv'
