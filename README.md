@@ -160,7 +160,13 @@ order:
    (>=90% lines/statements/functions, >=85% branches).
 8. **Frontend supply chain** - `npm audit` (high/critical), license allowlist,
    `cyclonedx-npm` SBOM.
-9. **DAST** - `docker compose up` `api`+`web` and two ZAP baseline scans.
+9. **Container image CVE scan** - `trivy` on `resolution-api` and
+   `resolution-web`; fails on any HIGH or CRITICAL unfixed vulnerability.
+10. **DAST** - `docker compose up` `api`+`web` and two ZAP baseline scans.
+
+All 11 gates are required status checks on `main`. Direct pushes and
+force-pushes are blocked; every change must arrive via a pull request with at
+least one approving review.
 
 ## Security model
 
@@ -174,6 +180,10 @@ order:
   read-only root filesystem with narrow `tmpfs` mounts.
 - Network egress from the containers is limited to the host machine; the API
   reaches Ollama via `host.docker.internal:11434` with no public internet access.
+- Container images are scanned for OS-level CVEs with `trivy` on every CI run;
+  HIGH and CRITICAL unfixed vulnerabilities block the pipeline.
+- `main` is branch-protected: all 11 CI gates must pass, force-pushes are
+  blocked, and at least one review is required before merging.
 
 ## Troubleshooting
 

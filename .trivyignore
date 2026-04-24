@@ -1,0 +1,13 @@
+# Trivy CVE suppression — reviewed and accepted risks
+#
+# CVE-2026-24049  wheel <=0.45.1  (Privilege Escalation via malicious wheel file)
+# CVE-2026-23949  jaraco.context <=5.3.0  (Path traversal via malicious tar archive)
+#
+# Both vulnerabilities are triggered only during package installation, not at runtime.
+# The standalone packages are already upgraded (wheel 0.47.0, jaraco.context 6.1.2).
+# The remaining findings come from setuptools' private _vendor/ directory, which is
+# an internal build-toolchain copy never invoked by the running FastAPI container.
+# Suppressing here is the correct response; upgrading setuptools does not resolve
+# the vendored paths in the version shipped with python:3.11-slim-bookworm.
+CVE-2026-24049
+CVE-2026-23949
