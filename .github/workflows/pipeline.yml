@@ -281,7 +281,7 @@ jobs:
           printf "10055\tIGNORE\tunsafe-inline required for Tailwind and React inline styles\n" >> .zap/rules.tsv
           printf "10109\tIGNORE\tInformational only: ZAP flags all SPAs as modern web apps\n" >> .zap/rules.tsv
           printf "90003\tIGNORE\tSRI not applicable for self-hosted Vite build artifacts\n" >> .zap/rules.tsv
-          chmod -R 777 .
+          sudo chmod -R 777 .
 
       - name: OWASP ZAP Baseline Scan (API)
         uses: zaproxy/action-baseline@v0.15.0
@@ -293,7 +293,7 @@ jobs:
 
       - name: Reset report file permissions
         if: always()
-        run: chmod -R 777 .
+        run: sudo chmod -R 777 .
 
       - name: OWASP ZAP Baseline Scan (Web)
         uses: zaproxy/action-baseline@v0.15.0
