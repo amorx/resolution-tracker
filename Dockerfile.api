@@ -1,0 +1,32 @@
+# syntax=docker/dockerfile:1.7
+# STAGE 1: Builder
+FROM python:3.11-slim-bookworm AS builder
+ENV PIP_ROOT_USER_ACTION=ignore
+WORKDIR /build
+COPY requirements.txt .
+RUN pip install --no-cache-dir --user -r requirements.txt
+
+# STAGE 2: Runtime
+FROM python:3.11-slim-bookworm AS runtime
+
+RUN groupadd -g 1000 appgroup && \
+    useradd -r -u 1000 -g appgroup appuser && \
+    mkdir -p /data && chown -R appuser:appgroup /data
+
+WORKDIR /home/appuser/app
+
+COPY --from=builder --chown=appuser:appgroup /root/.local /home/appuser/.local
+COPY --chown=appuser:appgroup src/ ./src/
+
+ENV PATH="/home/appuser/.local/bin:${PATH}"
+ENV PYTHONPATH="/home/appuser/app"
+ENV DB_PATH="/data/resolution.db"
+
+USER appuser
+
+EXPOSE 8080
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
+  CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/api/health', timeout=3)"
+
+CMD ["python", "-m", "uvicorn", "src.app:app", "--host", "0.0.0.0", "--port", "8080"]

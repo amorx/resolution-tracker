@@ -1,0 +1,58 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: resolution-api
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:?set ENCRYPTION_KEY in .env before starting}
+      OLLAMA_URL: ${OLLAMA_URL:-http://host.docker.internal:11434}
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-gemma4:26b}
+      DB_PATH: /data/resolution.db
+      CORS_ORIGIN: http://localhost:5173
+      CHECKIN_HOURS: ${CHECKIN_HOURS:-9,13,18}
+      ENABLE_SCHEDULER: "true"
+    volumes:
+      - api-data:/data
+    ports:
+      - "8080:8080"
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/api/health', timeout=3)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    container_name: resolution-web
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "5173:5173"
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/cache/nginx
+      - /var/run
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    restart: unless-stopped
+
+volumes:
+  api-data:

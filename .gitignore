@@ -9,4 +9,12 @@ htmlcov/
 *.log
 .env
 .env.*
+!.env.example
 .DS_Store
+web/node_modules
+web/dist
+web/coverage
+web/sbom.json
+web/*.tsbuildinfo
+bom.json
+.logs/
